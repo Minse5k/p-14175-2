@@ -28,6 +28,22 @@ export default function Page() {
     });
   };
 
+  const deleteComment = (commentId: number) => {
+    if (!confirm(`${commentId}번 댓글을 정말 삭제하시겠습니까?`)) return;
+
+    apiFetch(`/api/v1/posts/${id}/comments/${commentId}`, {
+      method: "DELETE",
+    }).then((data) => {
+      alert(data.msg);
+
+      if (postComments == null) return;
+
+      setPostComments(
+        postComments.filter((comment) => comment.id != commentId),
+      );
+    });
+  };
+
   useEffect(() => {
     apiFetch(`/api/v1/posts/${id}`).then(setPost);
     apiFetch(`/api/v1/posts/${id}/comments`).then(setPostComments);
@@ -66,8 +82,15 @@ export default function Page() {
       {postComments != null && postComments.length > 0 && (
         <ul>
           {postComments.map((comment) => (
-            <li key={comment.id}>
+            <li key={comment.id} className="flex gap-2 items-start">
+              <span>{comment.id} :</span>
               <span style={{ whiteSpace: "pre-line" }}>{comment.content}</span>
+              <button
+                className="px-2 rounded border cursor-pointer"
+                onClick={() => deleteComment(comment.id)}
+              >
+                삭제
+              </button>
             </li>
           ))}
         </ul>
