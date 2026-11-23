@@ -1,19 +1,20 @@
-"use client"
+"use client";
 
 import { apiFetch } from "@/lib/backend/client";
-import { PostWithContentDto } from "@/type/post";
+import type { PostWithContentDto } from "@/type/post";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Loading from "./loading";
 
 export default function Page() {
   const router = useRouter();
-  const {id} = useParams<{id: string}>();
+  const { id } = useParams<{ id: string }>();
 
   const [post, setPost] = useState<PostWithContentDto | null>(null);
 
   const deletePost = (id: number) => {
-    if(!confirm("정말 삭제하시겠습니까?")) return;
+    if (!confirm("정말 삭제하시겠습니까?")) return;
 
     apiFetch(`/api/v1/posts/${id}`, {
       method: "DELETE",
@@ -21,16 +22,16 @@ export default function Page() {
       alert(data.msg);
 
       router.replace("/posts");
-    })
-  }
+    });
+  };
 
   useEffect(() => {
     apiFetch(`/api/v1/posts/${id}`).then(setPost);
   }, [id]);
 
-  if(post == null) return <Loading />;
+  if (post == null) return <Loading />;
 
-  return(
+  return (
     <>
       <h1>글 상세페이지</h1>
 
@@ -39,10 +40,16 @@ export default function Page() {
       <div style={{ whiteSpace: "pre-line" }}>{post.content}</div>
 
       <div className="flex gap-2">
-        <button className="p-2 rounded border cursor-pointer" onClick={() => deletePost(post.id)}>
+        <button
+          className="p-2 rounded border cursor-pointer"
+          onClick={() => deletePost(post.id)}
+        >
           삭제
         </button>
+        <Link className="p-2 rounded border" href={`/posts/${post.id}/edit`}>
+          수정
+        </Link>
       </div>
     </>
-  )
+  );
 }
