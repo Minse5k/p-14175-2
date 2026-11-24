@@ -1,17 +1,19 @@
 "use client";
 
 import { apiFetch } from "@/lib/backend/client";
-import type { PostCommentDto, PostWithContentDto } from "@/type/post";
+import type { PostCommentDto } from "@/type/post";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Loading from "./loading";
+import usePost from "./_hooks/usePost";
 
 export default function Page() {
   const router = useRouter();
-  const { id } = useParams<{ id: string }>();
+  const { id: idStr } = useParams<{ id: string }>();
+  const id = parseInt(idStr);
 
-  const [post, setPost] = useState<PostWithContentDto | null>(null);
+  const {post} = usePost(id);
   const [postComments, setPostComments] = useState<PostCommentDto[] | null>(
     null,
   );
@@ -88,7 +90,6 @@ export default function Page() {
   };
 
   useEffect(() => {
-    apiFetch(`/api/v1/posts/${id}`).then(setPost).catch((error) => alert(error.message));
     apiFetch(`/api/v1/posts/${id}/comments`).then(setPostComments).catch((error) => alert(error.message));
   }, [id]);
 
