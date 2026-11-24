@@ -1,20 +1,16 @@
 "use client";
 
-import { apiFetch } from "@/lib/backend/client";
-import type { PostWithContentDto } from "@/type/post";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import Loading from "../loading";
+import usePost from "../_hooks/usePost";
 
 export default function Page() {
   const router = useRouter();
-  const { id } = useParams<{ id: string }>();
+  const { id: idStr } = useParams<{ id: string }>();
 
-  const [post, setPost] = useState<PostWithContentDto | null>(null);
-
-  useEffect(() => {
-    apiFetch(`/api/v1/posts/${id}`).then(setPost).catch((error) => alert(error.message));
-  }, [id]);
+  const id = parseInt(idStr);
+  const postState = usePost(id);
+  const {post} = postState;
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -58,17 +54,10 @@ export default function Page() {
       return;
     }
 
-    apiFetch(`/api/v1/posts/${id}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        title: titleInput.value,
-        content: contentTextarea.value,
-      }),
-    }).then((data) => {
+    postState.modifyPost(titleInput.value, contentTextarea.value, (data) => {
       alert(data.msg);
-
       router.replace(`/posts/${id}`);
-    }).catch((error) => alert(error.message));
+    })
   };
 
   if (post == null) return <Loading />;
