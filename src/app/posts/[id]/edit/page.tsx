@@ -13,7 +13,7 @@ export default function Page() {
   const [post, setPost] = useState<PostWithContentDto | null>(null);
 
   useEffect(() => {
-    apiFetch(`/api/v1/posts/${id}`).then(setPost);
+    apiFetch(`/api/v1/posts/${id}`).then(setPost).catch((error) => alert(error.message));
   }, [id]);
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
@@ -68,7 +68,7 @@ export default function Page() {
       alert(data.msg);
 
       router.replace(`/posts/${id}`);
-    });
+    }).catch((error) => alert(error.message));
   };
 
   if (post == null) return <Loading />;

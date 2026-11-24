@@ -25,7 +25,7 @@ export default function Page() {
       alert(data.msg);
 
       router.replace("/posts");
-    });
+    }).catch((error) => alert(error.message));
   };
 
   const deleteComment = (commentId: number) => {
@@ -41,7 +41,7 @@ export default function Page() {
       setPostComments(
         postComments.filter((comment) => comment.id != commentId),
       );
-    });
+    }).catch((error) => alert(error.message));
   };
 
   const handleCommentWriteSubmit = (
@@ -84,12 +84,12 @@ export default function Page() {
       if (postComments == null) return;
 
       setPostComments([...postComments, data.data]);
-    });
+    }).catch((error) => alert(error.message));
   };
 
   useEffect(() => {
-    apiFetch(`/api/v1/posts/${id}`).then(setPost);
-    apiFetch(`/api/v1/posts/${id}/comments`).then(setPostComments);
+    apiFetch(`/api/v1/posts/${id}`).then(setPost).catch((error) => alert(error.message));
+    apiFetch(`/api/v1/posts/${id}/comments`).then(setPostComments).catch((error) => alert(error.message));
   }, [id]);
 
   if (post == null) return <Loading />;

@@ -59,7 +59,7 @@ export default function Page() {
       alert(data.msg);
 
       router.replace(`/posts/${data.data.id}`);
-    });
+    }).catch((error) => alert(error.message));
   }
 
   return (
