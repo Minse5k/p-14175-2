@@ -13,21 +13,20 @@ export default function Page() {
   const { id: idStr } = useParams<{ id: string }>();
   const id = parseInt(idStr);
 
-  const {post} = usePost(id);
+  const postState = usePost(id);
+  const {post} = postState;
   const [postComments, setPostComments] = useState<PostCommentDto[] | null>(
     null,
   );
 
-  const deletePost = (id: number) => {
+  const deletePost = () => {
     if (!confirm("정말 삭제하시겠습니까?")) return;
 
-    apiFetch(`/api/v1/posts/${id}`, {
-      method: "DELETE",
-    }).then((data) => {
+    postState.deletePost((data) => {
       alert(data.msg);
 
       router.replace("/posts");
-    }).catch((error) => alert(error.message));
+    })
   };
 
   const deleteComment = (commentId: number) => {
@@ -106,7 +105,7 @@ export default function Page() {
       <div className="flex gap-2">
         <button
           className="p-2 rounded border cursor-pointer"
-          onClick={() => deletePost(post.id)}
+          onClick={deletePost}
         >
           삭제
         </button>
