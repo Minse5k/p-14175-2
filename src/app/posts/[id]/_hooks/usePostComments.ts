@@ -50,5 +50,31 @@ export default function usePostComments(postId: number) {
       .catch((error) => alert(error.message));
   };
 
-  return { postId, postComments, deleteComment, writeComment };
+
+
+
+  const modifyComment = (
+    commentId: number,
+    content: string,
+    onSuccess: (data: { msg: string }) => void,
+  ) => {
+    apiFetch(`/api/v1/posts/${postId}/comments/${commentId}`, {
+      method: "PUT",
+      body: JSON.stringify({ content }),
+    })
+      .then((data) => {
+        onSuccess(data);
+
+        if (postComments == null) return;
+
+        setPostComments(
+          postComments.map((comment) =>
+            comment.id == commentId ? { ...comment, content } : comment,
+          ),
+        );
+      })
+      .catch((error) => alert(error.message));
+  };
+
+  return { postId, postComments, deleteComment, writeComment, modifyComment };
 }

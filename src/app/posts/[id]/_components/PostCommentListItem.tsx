@@ -23,24 +23,45 @@ export default function PostCommentListItem({
     });
   };
 
-  return (
-    <li className="flex gap-2 items-start">
-      <span>{comment.id} :</span>
-      <button
-        className="px-2 rounded border cursor-pointer"
-        onClick={deleteComment}
-      >
-        삭제
-      </button>
-      {!modifyMode && (
-        <span style={{ whiteSpace: "pre-line" }}>{comment.content}</span>
-      )}
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
+    const form = e.currentTarget;
+
+    const contentTextarea = form.elements.namedItem(
+      "content",
+    ) as HTMLTextAreaElement;
+
+    contentTextarea.value = contentTextarea.value.trim();
+
+    if (contentTextarea.value.length === 0) {
+      alert("댓글 내용을 입력해주세요.");
+      contentTextarea.focus();
+      return;
+    }
+
+    if (contentTextarea.value.length < 2) {
+      alert("댓글 내용을 2자 이상 입력해주세요.");
+      contentTextarea.focus();
+      return;
+    }
+
+    postCommentsState.modifyComment(
+      comment.id,
+      contentTextarea.value,
+      (data) => {
+        alert(data.msg);
+        toggleModifyMode();
+      },
+    );
+  };
+
+  return (
+    <li className="flex gap-2 items-center">
+      <span>{comment.id} :</span>
+      {!modifyMode && <span>{comment.content}</span>}
       {modifyMode && (
-        <form
-          className="flex gap-2 items-center"
-          onSubmit={(e) => e.preventDefault()}
-        >
+        <form className="flex gap-2 items-center" onSubmit={handleSubmit}>
           <textarea
             className="border p-2 rounded"
             name="content"
@@ -48,17 +69,24 @@ export default function PostCommentListItem({
             maxLength={100}
             rows={5}
             defaultValue={comment.content}
+            autoFocus
           />
           <button className="p-2 rounded border cursor-pointer" type="submit">
-            저장
+            수정
           </button>
         </form>
       )}
       <button
-        className="px-2 rounded border cursor-pointer"
+        className="p-2 rounded border cursor-pointer"
         onClick={toggleModifyMode}
       >
         {modifyMode ? "수정취소" : "수정"}
+      </button>
+      <button
+        className="p-2 rounded border cursor-pointer"
+        onClick={deleteComment}
+      >
+        삭제
       </button>
     </li>
   );
