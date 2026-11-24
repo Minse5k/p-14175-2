@@ -57,11 +57,13 @@ export default function PostCommentListItem({
   };
 
   return (
-    <li className="flex gap-2 items-center">
+    <li className="flex gap-2 items-start">
       <span>{comment.id} :</span>
-      {!modifyMode && <span>{comment.content}</span>}
+      {!modifyMode && (
+        <span style={{ whiteSpace: "pre-line" }}>{comment.content}</span>
+      )}
       {modifyMode && (
-        <form className="flex gap-2 items-center" onSubmit={handleSubmit}>
+        <form className="flex gap-2 items-start" onSubmit={handleSubmit}>
           <textarea
             className="border p-2 rounded"
             name="content"
@@ -72,7 +74,7 @@ export default function PostCommentListItem({
             autoFocus
           />
           <button className="p-2 rounded border cursor-pointer" type="submit">
-            수정
+            저장
           </button>
         </form>
       )}
