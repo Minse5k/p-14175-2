@@ -1,13 +1,11 @@
 "use client";
-
-import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Loading from "./loading";
 import usePost from "./_hooks/usePost";
 import usePostComments from "./_hooks/usePostComments";
+import PostInfo from "./_components/PostInfo";
 
 export default function Page() {
-  const router = useRouter();
   const { id: idStr } = useParams<{ id: string }>();
   const id = parseInt(idStr);
 
@@ -17,15 +15,7 @@ export default function Page() {
   const postCommentsState = usePostComments(id);
   const { postComments } = postCommentsState;
 
-  const deletePost = () => {
-    if (!confirm("정말 삭제하시겠습니까?")) return;
-
-    postState.deletePost((data) => {
-      alert(data.msg);
-
-      router.replace("/posts");
-    });
-  };
+  
 
   const deleteComment = (commentId: number) => {
     if (!confirm(`${commentId}번 댓글을 정말 삭제하시겠습니까?`)) return;
@@ -73,23 +63,7 @@ export default function Page() {
 
   return (
     <>
-      <h1>글 상세페이지</h1>
-
-      <div>번호 : {post.id}</div>
-      <div>제목 : {post.title}</div>
-      <div style={{ whiteSpace: "pre-line" }}>{post.content}</div>
-
-      <div className="flex gap-2">
-        <button
-          className="p-2 rounded border cursor-pointer"
-          onClick={deletePost}
-        >
-          삭제
-        </button>
-        <Link className="p-2 rounded border" href={`/posts/${post.id}/edit`}>
-          수정
-        </Link>
-      </div>
+      <PostInfo postState={postState} />
 
       <h2>댓글 작성</h2>
 
