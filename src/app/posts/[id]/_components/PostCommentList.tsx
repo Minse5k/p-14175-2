@@ -1,4 +1,5 @@
 import usePostComments from "../_hooks/usePostComments";
+import PostCommentListItem from "./PostCommentListItem";
 
 export default function PostCommentList({
   postCommentsState,
@@ -6,14 +7,6 @@ export default function PostCommentList({
   postCommentsState: ReturnType<typeof usePostComments>;
 }) {
   const { postComments } = postCommentsState;
-
-  const deleteComment = (commentId: number) => {
-    if (!confirm(`${commentId}번 댓글을 정말 삭제하시겠습니까?`)) return;
-
-    postCommentsState.deleteComment(commentId, (data) => {
-      alert(data.msg);
-    });
-  };
 
   return (
     <>
@@ -28,16 +21,11 @@ export default function PostCommentList({
       {postComments != null && postComments.length > 0 && (
         <ul>
           {postComments.map((comment) => (
-            <li key={comment.id} className="flex gap-2 items-start">
-              <span>{comment.id} :</span>
-              <span style={{ whiteSpace: "pre-line" }}>{comment.content}</span>
-              <button
-                className="px-2 rounded border cursor-pointer"
-                onClick={() => deleteComment(comment.id)}
-              >
-                삭제
-              </button>
-            </li>
+            <PostCommentListItem
+              key={comment.id}
+              comment={comment}
+              postCommentsState={postCommentsState}
+            />
           ))}
         </ul>
       )}
