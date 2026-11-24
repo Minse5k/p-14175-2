@@ -1,12 +1,10 @@
 "use client";
 
-import { apiFetch } from "@/lib/backend/client";
-import type { PostCommentDto } from "@/type/post";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import Loading from "./loading";
 import usePost from "./_hooks/usePost";
+import usePostComments from "./_hooks/usePostComments";
 
 export default function Page() {
   const router = useRouter();
@@ -14,10 +12,10 @@ export default function Page() {
   const id = parseInt(idStr);
 
   const postState = usePost(id);
-  const {post} = postState;
-  const [postComments, setPostComments] = useState<PostCommentDto[] | null>(
-    null,
-  );
+  const { post } = postState;
+
+  const postCommentsState = usePostComments(id);
+  const { postComments } = postCommentsState;
 
   const deletePost = () => {
     if (!confirm("정말 삭제하시겠습니까?")) return;
@@ -26,23 +24,15 @@ export default function Page() {
       alert(data.msg);
 
       router.replace("/posts");
-    })
+    });
   };
 
   const deleteComment = (commentId: number) => {
     if (!confirm(`${commentId}번 댓글을 정말 삭제하시겠습니까?`)) return;
 
-    apiFetch(`/api/v1/posts/${id}/comments/${commentId}`, {
-      method: "DELETE",
-    }).then((data) => {
+    postCommentsState.deleteComment(commentId, (data) => {
       alert(data.msg);
-
-      if (postComments == null) return;
-
-      setPostComments(
-        postComments.filter((comment) => comment.id != commentId),
-      );
-    }).catch((error) => alert(error.message));
+    });
   };
 
   const handleCommentWriteSubmit = (
@@ -72,25 +62,12 @@ export default function Page() {
       return;
     }
 
-    apiFetch(`/api/v1/posts/${id}/comments`, {
-      method: "POST",
-      body: JSON.stringify({
-        content: contentTextarea.value,
-      }),
-    }).then((data) => {
+    postCommentsState.writeComment(contentTextarea.value, (data) => {
       alert(data.msg);
 
       contentTextarea.value = "";
-
-      if (postComments == null) return;
-
-      setPostComments([...postComments, data.data]);
-    }).catch((error) => alert(error.message));
+    });
   };
-
-  useEffect(() => {
-    apiFetch(`/api/v1/posts/${id}/comments`).then(setPostComments).catch((error) => alert(error.message));
-  }, [id]);
 
   if (post == null) return <Loading />;
 
